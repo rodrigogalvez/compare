@@ -11,6 +11,8 @@ class comparator
         '*.log',
         '*.rar',
         '*.7z',
+        '*.xls',
+        '*.xlsx',
         '*.backup_*',
         '/fact_xcbl/XCBL/*',
         '*/archivos/*',
@@ -117,40 +119,56 @@ switch ($argc) {
         }
         break;
     case 3:
+    case 4:
         $stamp = date("YmdHis");
         $primary = comparator::dir($argv[1]);
         $secondary = comparator::dir($argv[2]);
-        foreach (comparator::compare($primary["content"], $secondary["content"]) as $key => $value) {
-            switch ($value["status"]) {
-                case "EQUAL":
-                    break;
-                case "NEW":
-                    if ($value["type"] == "FILE") {
-                        $source = str_replace("/", DIRECTORY_SEPARATOR, $primary["base"] . $value["fullpath"]);
-                        $destination = str_replace("/", DIRECTORY_SEPARATOR, $secondary["base"] . $value["fullpath"]);
-                        echo "copy \"{$source}\" \"{$destination}\"\n";
-                    } else {
-                        $destination = str_replace("/", DIRECTORY_SEPARATOR, $secondary["base"] . $value["fullpath"]);
-                        echo "mkdir \"{$destination}\"\n";
-                    }
-                    break;
-                case "CHANGED":
-                    if ($value["type"] == "FILE") {
-                        $source = str_replace("/", DIRECTORY_SEPARATOR, $primary["base"] . $value["fullpath"]);
-                        $destination = str_replace("/", DIRECTORY_SEPARATOR, $secondary["base"] . $value["fullpath"]);
-                        echo "ren \"{$destination}\" \"{$destination}.backup_{$stamp}\"\n";
-                        echo "copy \"{$source}\" \"{$destination}\"\n";
-                    }
-                    break;
-                case "WASTED":
-                    if ($value["type"] == "FILE") {
-                        $destination = str_replace("/", DIRECTORY_SEPARATOR, $secondary["base"] . $value["fullpath"]);
-                        echo "del \"{$destination}\"\n";
-                    } else {
-                        $destination = str_replace("/", DIRECTORY_SEPARATOR, $secondary["base"] . $value["fullpath"]);
-                        echo "rmdir \"{$destination}\"\n";
-                    }
-                    break;
+        if (in_array("--fc", $argv)) {
+            foreach (comparator::compare($primary["content"], $secondary["content"]) as $key => $value) {
+                switch ($value["status"]) {
+                    case "CHANGED":
+                        if ($value["type"] == "FILE") {
+                            $source = str_replace("/", DIRECTORY_SEPARATOR, $primary["base"] . $value["fullpath"]);
+                            $destination = str_replace("/", DIRECTORY_SEPARATOR, $secondary["base"] . $value["fullpath"]);
+                            echo "fc \"{$source}\" \"{$destination}\"\n";
+                        }
+                        break;
+                }
+
+            }
+        } else {
+            foreach (comparator::compare($primary["content"], $secondary["content"]) as $key => $value) {
+                switch ($value["status"]) {
+                    case "EQUAL":
+                        break;
+                    case "NEW":
+                        if ($value["type"] == "FILE") {
+                            $source = str_replace("/", DIRECTORY_SEPARATOR, $primary["base"] . $value["fullpath"]);
+                            $destination = str_replace("/", DIRECTORY_SEPARATOR, $secondary["base"] . $value["fullpath"]);
+                            echo "copy \"{$source}\" \"{$destination}\"\n";
+                        } else {
+                            $destination = str_replace("/", DIRECTORY_SEPARATOR, $secondary["base"] . $value["fullpath"]);
+                            echo "mkdir \"{$destination}\"\n";
+                        }
+                        break;
+                    case "CHANGED":
+                        if ($value["type"] == "FILE") {
+                            $source = str_replace("/", DIRECTORY_SEPARATOR, $primary["base"] . $value["fullpath"]);
+                            $destination = str_replace("/", DIRECTORY_SEPARATOR, $secondary["base"] . $value["fullpath"]);
+                            echo "ren \"{$destination}\" \"{$destination}.backup_{$stamp}_changed\"\n";
+                            echo "copy \"{$source}\" \"{$destination}\"\n";
+                        }
+                        break;
+                    case "WASTED":
+                        if ($value["type"] == "FILE") {
+                            $destination = str_replace("/", DIRECTORY_SEPARATOR, $secondary["base"] . $value["fullpath"]);
+                            echo "ren \"{$destination}\" \"{$destination}.backup_{$stamp}_deleted\"\n";
+                        } else {
+                            $destination = str_replace("/", DIRECTORY_SEPARATOR, $secondary["base"] . $value["fullpath"]);
+                            echo "rmdir \"{$destination}\"\n";
+                        }
+                        break;
+                }
             }
         }
         break;

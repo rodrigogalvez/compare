@@ -20,5 +20,5 @@ Crear un programa que compare la carpeta del repositorio del proyecto contra la 
 El programa publicado presenta un listado de diferencias entre los acrhivos de la carpeta del proyecto y al versión en uso en QAS. Después se utilizará en producción para realizar la homologación final. Las diferencias son presentadas como comandos de DOS ya que los servidores corren sobre Windows Server. Los comandos están implementados para renombrar cualquier archivo que debe ser reemplazado antes de realizar efectivamente el reemplazo.
 
 # Próximos cambios
-[ ] Los archivos que se eliminan deben ser renombrados y marcados como eliminados.
-[ ] Obtener una comparación de los archivos línea a línea como el comando FC de Windows antes de decidir qué cambios realizar.
+- [x] Los archivos que se eliminan deben ser renombrados y marcados como eliminados.
+- [ ] Obtener una comparación de los archivos línea a línea como el comando FC de Windows antes de decidir qué cambios realizar.
